@@ -1,8 +1,8 @@
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local Window = Rayfield:CreateWindow({
-   Name = "NVB Hub | VIP v13.0 FINAL",
-   LoadingTitle = "ALL FEATURES RESTORED",
+   Name = "NVB Hub | VIP v17.0 ULTIMATE",
+   LoadingTitle = "SEPARATED TELEPORT & FULL FEATURES",
    LoadingSubtitle = "by neveryourbae - Mobile",
    ConfigurationSaving = { Enabled = true, FolderName = "NVB_Configs" }
 })
@@ -27,7 +27,7 @@ _G.FullBright = false
 _G.CH_Enabled = false
 _G.CH_Color = Color3.fromRGB(255, 0, 0)
 
--- [[ CROSSHAIR ENGINE ]]
+-- [[ 1. CROSSHAIR ]]
 local CrosshairGUI = Instance.new("ScreenGui", game.CoreGui)
 local CH_Container = Instance.new("Frame", CrosshairGUI)
 CH_Container.BackgroundTransparency = 1; CH_Container.Size = UDim2.new(0, 50, 0, 50); CH_Container.AnchorPoint = Vector2.new(0.5, 0.5); CH_Container.Position = UDim2.new(0.5, 0, 0.5, 0)
@@ -39,7 +39,26 @@ local function UpdateCH()
     Instance.new("UICorner", d).CornerRadius = UDim.new(1, 0)
 end
 
--- [[ FUNGSI TAG REALTIME ESP ]]
+-- [[ 2. FLOATING BUTTON (AUTO AIM) ]]
+local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
+local AimBtn = Instance.new("TextButton", ScreenGui)
+AimBtn.Name = "AimButton"; AimBtn.Size = UDim2.new(0, 65, 0, 65); AimBtn.Position = UDim2.new(0.15, 0, 0.4, 0)
+AimBtn.BackgroundColor3 = Color3.fromRGB(255, 50, 50); AimBtn.Text = "AIM: OFF"; AimBtn.TextColor3 = Color3.new(1,1,1)
+AimBtn.Font = Enum.Font.SourceSansBold; AimBtn.TextSize = 14; AimBtn.ZIndex = 10
+Instance.new("UICorner", AimBtn).CornerRadius = UDim.new(1, 0)
+local UIStroke = Instance.new("UIStroke", AimBtn); UIStroke.Thickness = 3; UIStroke.Color = Color3.new(0,0,0)
+
+local dragging, dragStart, startPos
+AimBtn.InputBegan:Connect(function(input) if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then dragging = true; dragStart = input.Position; startPos = AimBtn.Position end end)
+UserInputService.InputChanged:Connect(function(input) if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then local delta = input.Position - dragStart; AimBtn.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y) end end)
+UserInputService.InputEnded:Connect(function() dragging = false end)
+AimBtn.MouseButton1Click:Connect(function() 
+    _G.AutoAim = not _G.AutoAim
+    AimBtn.BackgroundColor3 = _G.AutoAim and Color3.fromRGB(50, 255, 50) or Color3.fromRGB(255, 50, 50)
+    AimBtn.Text = _G.AutoAim and "AIM: ON" or "AIM: OFF"
+end)
+
+-- [[ 3. FUNGSI TAG ESP REALTIME ]]
 local function createTag(char, color, name)
     local head = char:WaitForChild("Head", 5)
     if head then
@@ -47,26 +66,11 @@ local function createTag(char, color, name)
         tag.Name = "NVBTag"; tag.Size = UDim2.new(0, 150, 0, 70); tag.AlwaysOnTop = true; tag.ExtentsOffset = Vector3.new(0, 3, 0)
         local tl = tag:FindFirstChild("TextLabel") or Instance.new("TextLabel", tag)
         tl.Size = UDim2.new(1, 0, 1, 0); tl.BackgroundTransparency = 1; tl.TextColor3 = color; tl.TextStrokeTransparency = 0; tl.TextSize = 13; tl.Font = Enum.Font.SourceSansBold
-        local hum = char:FindFirstChild("Humanoid")
-        local root = char:FindFirstChild("HumanoidRootPart")
-        local myRoot = lp.Character and lp.Character:FindFirstChild("HumanoidRootPart")
+        local hum = char:FindFirstChild("Humanoid"); local root = char:FindFirstChild("HumanoidRootPart"); local myRoot = lp.Character and lp.Character:FindFirstChild("HumanoidRootPart")
         local dist = (myRoot and root) and math.floor((myRoot.Position - root.Position).Magnitude) or 0
         tl.Text = name .. "\nHP: " .. (hum and math.floor(hum.Health) or 0) .. "\n[" .. dist .. " Studs]"
     end
 end
-
--- [[ TOMBOL BULAT FLOATING (AUTO AIM) ]]
-local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
-local AimBtn = Instance.new("TextButton", ScreenGui)
-AimBtn.Name = "AimButton"; AimBtn.Size = UDim2.new(0, 60, 0, 60); AimBtn.Position = UDim2.new(0.1, 0, 0.5, 0)
-AimBtn.BackgroundColor3 = Color3.fromRGB(255, 50, 50); AimBtn.Text = "AIM: OFF"; AimBtn.TextColor3 = Color3.new(1,1,1)
-AimBtn.Font = Enum.Font.SourceSansBold; AimBtn.TextSize = 14; Instance.new("UICorner", AimBtn).CornerRadius = UDim.new(1, 0)
-
-local dragging, dragStart, startPos
-AimBtn.InputBegan:Connect(function(input) if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then dragging = true; dragStart = input.Position; startPos = AimBtn.Position end end)
-UserInputService.InputChanged:Connect(function(input) if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then local delta = input.Position - dragStart; AimBtn.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y) end end)
-UserInputService.InputEnded:Connect(function() dragging = false end)
-AimBtn.MouseButton1Click:Connect(function() _G.AutoAim = not _G.AutoAim; AimBtn.BackgroundColor3 = _G.AutoAim and Color3.fromRGB(50, 255, 50) or Color3.fromRGB(255, 50, 50); AimBtn.Text = _G.AutoAim and "AIM: ON" or "AIM: OFF" end)
 
 -- [[ TABS ]]
 local TabComb = Window:CreateTab("Combat", 4483362458)
@@ -75,13 +79,24 @@ TabComb:CreateDropdown({Name = "Auto Aim Target", Options = {"Killer", "Survivor
 TabComb:CreateToggle({Name = "Hitbox Expander", CurrentValue = false, Callback = function(V) _G.HitboxEnabled = V end})
 TabComb:CreateSlider({Name = "Hitbox Size", Range = {2, 50}, Increment = 1, CurrentValue = 2, Callback = function(V) _G.HitboxSize = V end})
 
+-- [[ TAB TELEPORT - SEPARATED ]]
 local TabTele = Window:CreateTab("Teleport", 4483362458)
-local Dropdown = TabTele:CreateDropdown({Name = "Pilih Pemain", Options = {}, Callback = function(Option) SelectedPlayer = Option[1] end})
-TabTele:CreateButton({Name = "Refresh & Teleport", Callback = function()
+local PlayerDropdown = TabTele:CreateDropdown({Name = "Select Player", Options = {}, Callback = function(Option) SelectedPlayer = Option[1] end})
+TabTele:CreateButton({Name = "1. Refresh Player List", Callback = function()
     local pList = {}
     for _, v in pairs(game.Players:GetPlayers()) do if v ~= lp then table.insert(pList, v.Name) end end
-    Dropdown:Refresh(pList, true)
-    if SelectedPlayer and game.Players:FindFirstChild(SelectedPlayer) then lp.Character.HumanoidRootPart.CFrame = game.Players[SelectedPlayer].Character.HumanoidRootPart.CFrame end
+    PlayerDropdown:Refresh(pList, true)
+    Rayfield:Notify({Title = "Teleport", Content = "Daftar pemain diperbarui!", Duration = 2})
+end})
+TabTele:CreateButton({Name = "2. Teleport Now", Callback = function()
+    if SelectedPlayer and game.Players:FindFirstChild(SelectedPlayer) then
+        local targetChar = game.Players[SelectedPlayer].Character
+        if targetChar and targetChar:FindFirstChild("HumanoidRootPart") then
+            lp.Character.HumanoidRootPart.CFrame = targetChar.HumanoidRootPart.CFrame
+        end
+    else
+        Rayfield:Notify({Title = "Error", Content = "Pilih pemain dulu dari dropdown!", Duration = 2})
+    end
 end})
 
 local TabVis = Window:CreateTab("Visuals", 4483362458)
@@ -99,6 +114,13 @@ TabExp:CreateToggle({Name = "Ghost Mode", CurrentValue = false, Callback = funct
 end})
 TabExp:CreateToggle({Name = "Noclip", CurrentValue = false, Callback = function(V) _G.Noclip = V end})
 TabExp:CreateToggle({Name = "Full Bright", CurrentValue = false, Callback = function(V) _G.FullBright = V end})
+
+local TabMisc = Window:CreateTab("Misc", 4483362458)
+TabMisc:CreateButton({Name = "FPS BOOST (ANTI-LAG)", Callback = function()
+    for _, v in pairs(game:GetDescendants()) do if v:IsA("BasePart") then v.Material = Enum.Material.SmoothPlastic elseif v:IsA("Texture") or v:IsA("Decal") then v:Destroy() end end
+    Lighting.GlobalShadows = false
+end})
+TabMisc:CreateSlider({Name = "Speed Hack", Range = {16, 250}, Increment = 1, CurrentValue = 16, Callback = function(V) if lp.Character:FindFirstChild("Humanoid") then lp.Character.Humanoid.WalkSpeed = V end end})
 
 -- [[ CORE LOGIC ]]
 RunService.Stepped:Connect(function()
@@ -136,7 +158,7 @@ task.spawn(function()
                 end
             end
         end
-        task.wait(0.2)
+        task.wait(0.25)
     end
 end)
 
