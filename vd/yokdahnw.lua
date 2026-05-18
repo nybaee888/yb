@@ -206,5 +206,3 @@ task.spawn(function()
 end)
 
 RunService.RenderStepped:Connect(function() if _G.FullBright then Lighting.Brightness = 2; Lighting.ClockTime = 14; Lighting.GlobalShadows = false end end)
-
-```
